@@ -1,0 +1,79 @@
+ Script: Auto Steal, Auto Farm & FinderJogo: Steal an Egg (Roblox)
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+-- Configurações das Funções (Toggles)
+getgenv().AutoFarm = false
+getgenv().AutoSteal = false
+getgenv().EggFinder = false
+
+-- Função: Finder (Destaca ovos raros ou disponíveis no mapa)
+local function toggleEggFinder(state)
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj.Name:lower():find("egg") and obj:IsA("BasePart") then
+            local highlight = obj:FindFirstChild("EggHighlight")
+            if state then
+                if not highlight then
+                    local hl = Instance.new("Highlight")
+                    hl.Name = "EggHighlight"
+                    hl.Adornee = obj
+                    hl.FillColor = Color3.fromRGB(255, 215, 0) -- Dourado
+                    hl.Parent = obj
+                end
+            else
+                if highlight then
+                    highlight:Destroy()
+                end
+            end
+        end
+    end
+end
+
+-- Função: Auto Farm (Coleta automática de recursos/moedas próximas)
+task.spawn(function()
+    while task.wait(0.5) do
+        if getgenv().AutoFarm then
+            pcall(function()
+                -- Substitua "Coin" ou "FarmPart" pelo nome real do objeto de farm no jogo
+                for _, v in pairs(Workspace:GetDescendants()) do
+                    if v.Name == "Coin" or v.Name == "FarmItem" then
+                        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                            LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+                            task.wait(0.1)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- Função: Auto Steal (Rouba ovos de outros jogadores automaticamente)
+task.spawn(function()
+    while task.wait(1) do
+        if getgenv().AutoSteal then
+            pcall(function()
+                -- Lógica para teleportar até o ninho/base inimiga e pegar o ovo
+                for _, player in pairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        -- Exemplo genérico: Procura por ovos na base dos outros jogadores
+                        local enemyBase = Workspace:FindFirstChild(player.Name .. "Base")
+                        if enemyBase and enemyBase:FindFirstChild("Egg") then
+                            LocalPlayer.Character.HumanoidRootPart.CFrame = enemyBase.Egg.CFrame
+                            task.wait(0.2)
+                            -- Simula a interação de roubo (pode requerer firetouchinterest)
+                            firetouchinterest(LocalPlayer.Character.HumanoidRootPart, enemyBase.Egg, 0)
+                            firetouchinterest(LocalPlayer.Character.HumanoidRootPart, enemyBase.Egg, 1)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end) Interface Simples (Exemplo com Rayfield ou Orion Library se desejar)
+print("Script carregado com sucesso!")
+print("Ative as funções alterando as variáveis globais:")
+print("getgenv().AutoFarm = true")
+print("getgenv().AutoSteal = true")
+print("getgenv().EggFinder = true")
